@@ -1,0 +1,156 @@
+1. STUDENTS
+create table students(
+netid varchar(7),
+name text,
+dob date,
+password varchar(20),
+email varchar(30),
+mailing_address text,
+home_address text,
+contact_no varchar(10),
+type varchar(1),
+application_number varchar(20),
+dept_no int,
+PRIMARY KEY (netid),
+CONSTRAINT department FOREIGN KEY (dept_no)
+REFERENCES departments(dept_no)
+)
+
+2. DEPARTMENTS
+create table departments(
+dept_no int auto_increment,
+dept_name text,
+PRIMARY KEY (dept_no)
+)
+
+3. APPLICATION_STATUS
+create table application_status(
+netid varchar(7),
+application_number varchar(20),
+application_status text,
+application_name text,
+application_date date,
+PRIMARY KEY (netid,application_number),
+CONSTRAINT student FOREIGN KEY (netid)
+REFERENCES students(netid),
+CONSTRAINT application FOREIGN KEY (application_number)
+REFERENCES students(application_number)
+)
+
+4. TO-DO LIST
+create table todo_list(
+todo_no int auto_increment,
+netid varchar(7),
+description text,
+due_date date,
+PRIMARY KEY (todo_no),
+CONSTRAINT student FOREIGN KEY (netid)
+REFERENCES students(netid)
+)
+
+5. INSTRUCTORS
+create table instructors(
+instructor_id int auto_increment,
+name text,
+dept_no int,
+PRIMARY KEY (instructor_id),
+CONSTRAINT instructor_dept FOREIGN KEY (dept_no)
+REFERENCES departments(dept_no)
+)
+
+6. COURSES
+create table courses(
+course_no varchar(10),
+name text,
+dept_no int,
+instructor_id int,
+course_strength int,
+course_time varchar(20),
+room_no varchar(10),
+start_date date,
+end_date date,
+term_id int,
+course_code varchar(20),
+PRIMARY KEY (course_no,instructor_id,term_id),
+CONSTRAINT department_courses FOREIGN KEY (dept_no)
+REFERENCES departments(dept_no),
+CONSTRAINT instructor_courses FOREIGN KEY (instructor_id)
+REFERENCES instructors(instructor_id),
+CONSTRAINT term_courses FOREIGN KEY (term_id)
+REFERENCES terms(term_id)
+)
+
+7. TERMS
+create table terms(
+term_id int auto_increment,
+name text,
+primary key(term_id)
+)
+
+8. ENROLLED_COURSES
+create table enrolled_courses(
+netid varchar(7),
+course_no varchar(10),
+term_id int,
+primary key(netid,course_no),
+CONSTRAINT student_enrolled FOREIGN KEY (netid)
+REFERENCES students(netid),
+CONSTRAINT course_enrolled FOREIGN KEY (course_no)
+REFERENCES courses(course_no),
+CONSTRAINT term_enrolled FOREIGN KEY (term_id)
+REFERENCES terms(term_id)
+)
+
+9. DESIRED_COURSES
+create table desired_courses(
+netid varchar(7),
+course_no varchar(10),
+term_id int,
+primary key(netid,course_no),
+CONSTRAINT student_enrolled FOREIGN KEY (netid)
+REFERENCES students(netid),
+CONSTRAINT course_enrolled FOREIGN KEY (course_no)
+REFERENCES courses(course_no),
+CONSTRAINT term_enrolled FOREIGN KEY (term_id)
+REFERENCES terms(term_id)
+)
+
+10. HOLDS
+create table holds(
+hold_no int auto_increment,
+netid varchar(7),
+description text,
+due_date date,
+term_id int,
+PRIMARY KEY (hold_no),
+CONSTRAINT student FOREIGN KEY (netid)
+REFERENCES students(netid),
+CONSTRAINT term_enrolled FOREIGN KEY (term_id)
+REFERENCES terms(term_id)
+)
+
+11. FINANCIAL_INFO
+create table financial_info(
+info_no int auto_increment,
+netid varchar(7),
+description text,
+due_date date,
+amount varchar(10),
+PRIMARY KEY (info_no),
+CONSTRAINT student FOREIGN KEY (netid)
+REFERENCES students(netid)
+)
+
+12. INSTRUCTOR_COURSE
+create table instructor_course(
+instructor_id int,
+course_no varchar(10),
+term_id int,
+PRIMARY KEY (instructor_id,course_no,term_id),
+CONSTRAINT instructor_courses FOREIGN KEY (instructor_id)
+REFERENCES instructors(instructor_id),
+CONSTRAINT term_instructor FOREIGN KEY (term_id)
+REFERENCES terms(term_id),
+CONSTRAINT course_instructors FOREIGN KEY (course_no)
+REFERENCES courses(course_no)
+)
