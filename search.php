@@ -1,0 +1,57 @@
+<?php
+/*
+	* This page is used to return the list of places
+*/
+require "config.php";
+	//groupid is retrieved by the client
+    if (isset($_POST['dept_name']) && isset($_POST['course_num']) && isset($_POST['restriction']) && isset($_POST['term'])){
+        $response_array = array();
+        $dept_name = $_POST['dept_name'];
+        $course_num = $_POST['course_num'];
+        $restriction = $_POST['restriction'];
+        $term = $_POST['term'];
+        //the list of locations for group_id is sent back to the client
+		$stmt = $conn->prepare("select dept_no from departments where dept_name = ?");
+		$stmt->execute(array($dept_name));
+		while ($row = $stmt->fetch()) {
+		    $dept_no = $row['dept_name'];
+        }
+        $stmt = $conn->prepare("select term_id from terms where name = ?");
+		$stmt->execute(array($term));
+		while ($row = $stmt->fetch()) {
+		    $term_id = $row['term_id'];
+        }
+        if ($restriction == "="){
+        	$stmt = $conn->prepare("select name,course_strength,instructor_id,course_time,room_no,start_date,end_date,course_code from courses where dept_no = ? and course_code = ? and term_id = ?");
+			$stmt->execute(array($dept_no,$course_num,$term_id));
+		}elseif($restriction == ">"){
+			$stmt = $conn->prepare("select name,course_strength,instructor_id,course_time,room_no,start_date,end_date,course_code from courses where dept_no = ? and course_code >= ? and term_id = ?");
+			$stmt->execute(array($dept_no,$course_num,$term_id));
+		}
+		while ($row = $stmt->fetch()) {
+		    $response = array();
+		    $response['couse_name'] = $row['name'];
+		    $response['course_strength'] = $row['course_strength'];
+		    $response['course_time'] = $row['course_time'];
+		    $response['room_no'] = $row['room_no'];
+		    $response['start_date'] = $row['start_date'];
+		    $response['end_date'] = $row['end_date'];
+		    $response['course_num'] = $dept_name . " " . $row['course_code'];
+		    $stmt_instructor = $conn_instructor->prepare("select name from instructors where instructor_id = ?");
+			$stmt_instructor->execute(array($row_instructor['instructor_id']));
+			while ($row_instructor = $stmt_instructor->fetch()) {
+		    	$instructor_name = $row_instructor['name'];
+		    }
+		    $response['instructor_name'] = $instructor_name;
+		    array_push($response_array,$response);
+        }
+        if(isset($response_array)){
+            echo json_encode($response_array);
+        }
+        else{
+            $response = array();
+            $response['success'] = 0;
+            echo json_encode($response);
+        }
+    }
+?>
