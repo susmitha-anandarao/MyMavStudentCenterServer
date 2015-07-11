@@ -12,7 +12,7 @@
 		$stmt = $conn->prepare("select name,type from students where netid = ? and password = ?");
 		$stmt->execute(array($netid,$password));
 		while ($row = $stmt->fetch()) {
-            $home_location = $row['name'];
+            $name = $row['name'];
             $type = $row['type'];
         }
         //if not registered, send an error message
