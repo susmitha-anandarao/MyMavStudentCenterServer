@@ -25,7 +25,7 @@ require "config.php";
 		$stmt->execute(array($dept_no,$course_num,$term_id));
 		while ($row = $stmt->fetch()) {
 			$response = array(
-		    'couse_name' => $row['name'],
+		    'course_name' => $row['name'],
 		    'course_strength' => $row['course_strength'],
 		    'course_time' => $row['course_time'],
 		    'room_no' => $row['room_no'],
@@ -37,23 +37,38 @@ require "config.php";
 		    array_push($response_array,$response);
         }
         $response_array_new = array();
-        foreach($response_array as $response_instance){
-        	$stmt = $conn->prepare("select name from instructors where instructor_id = ?");
-			$stmt->execute(array($response_instance['instructor_id']));
-			while ($row = $stmt->fetch()) {
-		    	$instructor_name = $row['name'];
-		    }
-		    $response_instance['instructor_name'] = $instructor_name;
-		    array_push($response_array_new,$response_instance);
+        if(isset($response_array)){
+        	
+        	foreach($response_array as $response_instance){
+        		$stmt = $conn->prepare("select name from instructors where instructor_id = ?");
+				$stmt->execute(array($response_instance['instructor_id']));
+				while ($row = $stmt->fetch()) {
+		    		$instructor_name = $row['name'];
+		    	}
+		    	$response_instance['instructor_name'] = $instructor_name;
+		    	array_push($response_array_new,$response_instance);
+        	}
         }
-        if(isset($response_array_new)){
-            echo json_encode($response_array_new);
+        if(empty($response_array_new)){
+        	if(empty($row)){
+            	/*$response = array();
+            	$response['success'] = 0;
+            	$response['message'] = "No corses found";
+            	echo json_encode($response);*/
+            	echo "failed";
+        	}	
         }
         else{
+        	echo json_encode($response_array_new);
+        }
+        /*if(isset($response_array_new)){
+            echo json_encode($response_array_new);
+        }
+        if(empty($row)){
             $response = array();
             $response['success'] = 0;
             $response['message'] = "No corses found";
             echo json_encode($response);
-        }
+        }*/
     }
 ?>

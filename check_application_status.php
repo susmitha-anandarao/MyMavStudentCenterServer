@@ -30,9 +30,7 @@ require "config.php";
             echo json_encode($response_array);
         }
         else{
-            $response = array();
-            $response['success'] = 0;
-            echo json_encode($response);
+            echo "failed";
         }
     }
 ?>
