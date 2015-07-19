@@ -21,7 +21,7 @@ require "config.php";
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        $stmt = $conn->prepare("select name,course_strength,instructor_id,course_time,room_no,start_date,end_date,course_code from courses where dept_no = ? and course_code " . $restriction . " ? and term_id = ?");
+        $stmt = $conn->prepare("select course_no,name,course_strength,instructor_id,course_time,room_no,start_date,end_date,course_code from courses where dept_no = ? and course_code " . $restriction . " ? and term_id = ?");
 		$stmt->execute(array($dept_no,$course_num,$term_id));
 		while ($row = $stmt->fetch()) {
 			$response = array(
@@ -33,6 +33,7 @@ require "config.php";
 		    'end_date' => $row['end_date'],
 		    'course_num' => $dept_name . " " . $row['course_code'],
 		    'instructor_id' => $row['instructor_id'],
+		    'unique_code' => $row['course_no'],
 		    );
 		    array_push($response_array,$response);
         }

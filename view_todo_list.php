@@ -14,13 +14,14 @@ require "config.php";
 		    $type = $row['type'];
         }
         if($type == "P"){
-        	$stmt = $conn->prepare("select todo_no,description,due_date from todo_list where netid = ?");
+        	$stmt = $conn->prepare("select todo_no,description,due_date,name from todo_list where netid = ?");
 			$stmt->execute(array($netid));
 			while ($row = $stmt->fetch()) {
 				$response = array();
 		    	$response['todo_no'] = $row['todo_no'];
 				$response['description'] = $row['description'];
 				$response['due_date'] = $row['due_date'];
+				$response['name'] = $row['name'];
 				array_push($response_array,$response);
         	}
         }

@@ -4,33 +4,22 @@
 */
 	require "config.php";
 	//meeeting details are provided by the client
-    if (isset($_POST['netid']) && isset($_POST['course_name']) && isset($_POST['term'])) {
+    if (isset($_POST['netid']) && isset($_POST['unique_code']) && isset($_POST['term'])) {
         $netid = $_POST['netid'];
-        $course_name = $_POST['course_name'];
+        $course_no = $_POST['unique_code'];
         $term = $_POST['term'];
         $stmt = $conn->prepare("select term_id from terms where name = ?");
 		$stmt->execute(array($term));
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        $stmt = $conn->prepare("select course_no from courses where name = ? and term_id = ?");
-		$stmt->execute(array($course_name,$term_id));
-		while ($row = $stmt->fetch()) {
-		    $course_no = $row['course_no'];
-        }
-        //the meeting details are insterted into the database
-        $query = "INSERT INTO desired_courses (net_id, course_no, term_id) VALUES (:netid,:course_no,:term_id)";
+        $query = "INSERT INTO desired_courses (netid, course_no, term_id) VALUES (:netid,:course_no,:term_id)";
         $stmt = $conn->prepare($query);
+        $result_course = $stmt->execute(array(':netid'=>$netid,':course_no'=>$course_no,':term_id'=>$term_id));
         
-        $result_course = $stmt->execute(array(':netid'=>$netid,':max_ppl'=>$course_no,':term_id'=>$term_id));
-        
-        if (isset($result_course)) {
+        if ($result_course == TRUE) {
             // successfully inserted into database
-        
-            $response["success"] = 1;
-            $response["message"] = "Course has been added to your cart";
- 
-            echo json_encode($response);
+            echo "success";
         } else {
             echo "failed";
         }
