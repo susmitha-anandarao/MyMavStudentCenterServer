@@ -1,6 +1,6 @@
 <?php
 /*
-	* This page is used search for a particular course
+	* This page is used to remove a particular course from the cart
 */
 require "config.php";
 	//dept_name,course_num,restriction,term is retrieved from client
