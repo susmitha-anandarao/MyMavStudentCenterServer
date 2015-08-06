@@ -14,7 +14,6 @@ require "config.php";
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        //echo "Netid = " . $netid . " term = " . $term_id . " unique_code = " . $unique_code;
         $query = "delete from desired_courses where netid = :netid and term_id = :term_id and course_no = :course_no";
         $stmt = $conn->prepare($query);
 		$stmt->bindParam(':netid', $netid, PDO::PARAM_STR); 
@@ -22,10 +21,9 @@ require "config.php";
         $stmt->bindParam(':course_no', $course_no, PDO::PARAM_STR); 
         $result = $stmt->execute();
         if(isset($result)){
-        	$response = array();
         	$response['success'] = 1;
             $response['message'] = "Course deleted from cart";
-            echo json_encode($response);
+            echo json_encode($response)
         	
         }
         else{

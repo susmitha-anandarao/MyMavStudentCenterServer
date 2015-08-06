@@ -5,6 +5,8 @@
 	require "config.php";
 	//meeeting details are provided by the client
     if (isset($_POST['netid']) && isset($_POST['unique_code']) && isset($_POST['term'])) {
+    	$course_strength = 0;
+    	$count_course = 0;
         $netid = $_POST['netid'];
         $course_no = $_POST['unique_code'];
         $term = $_POST['term'];
@@ -13,19 +15,19 @@
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        $stmt = $conn->prepare("select course_strength from courses c, enrolled_courses e where course_no = ? and e.course_no = c.course_no");
-		$stmt->execute(array($unique_code));
+        $stmt = $conn->prepare("select course_strength from courses where course_no = ?");
+		$stmt->execute(array($course_no));
 		while ($row = $stmt->fetch()) {
 		    $course_strength = $row['course_strength'];
         }
         $stmt = $conn->prepare("select count(*) as counts from enrolled_courses where netid = ? and term_id =?");
 		$stmt->execute(array($netid,$term_id));
 		while ($row = $stmt->fetch()) {
-		    $count = $row['counts'];
+		    $count_course = $row['counts'];
         }
-        if($counts < 5){
-        	$stmt = $conn->prepare("select count(*) as counts from enrolled_courses where course_no = ? ");
-			$stmt->execute(array($unique_code));
+        if($count_course < 5){
+        	$stmt = $conn->prepare("select count(*) as counts from enrolled_courses where course_no = ?");
+			$stmt->execute(array($unique_code,$term_id));
 			while ($row = $stmt->fetch()) {
 		    	$counts = $row['counts'];
         	}
@@ -33,13 +35,24 @@
         		$query = "INSERT INTO enrolled_courses (netid, course_no, term_id) VALUES (:netid,:course_no,:term_id)";
         		$stmt = $conn->prepare($query);
         		$result_course = $stmt->execute(array(':netid'=>$netid,':course_no'=>$course_no,':term_id'=>$term_id));
-        
-        		if ($result_course == TRUE) {
+        		$query_del = "delete from desired_courses where netid = :netid and term_id = :term_id and course_no = :course_no";
+        		$stmt_del = $conn->prepare($query_del);
+				$stmt_del->bindParam(':netid', $netid, PDO::PARAM_STR); 
+				$stmt_del->bindParam(':term_id', $term_id, PDO::PARAM_INT); 
+        		$stmt_del->bindParam(':course_no', $course_no, PDO::PARAM_STR); 
+        		$result_del = $stmt_del->execute();
+        		if ($result_course == TRUE && isset($result_del)) {
            		// successfully inserted into database
-           			if($counts > 3 and $counts < 6){
-           				$query_hold = "INSERT INTO holds (netid, name, description,term_id) VALUES (:netid,:name,:description,:due_date,:term_id)";
+           			$stmt = $conn->prepare("select count(*) as counts from enrolled_courses where netid = ? and term_id =?");
+					$stmt->execute(array($netid,$term_id));
+					while ($row = $stmt->fetch()) {
+		    			$count_course = $row['counts'];
+        			}
+           			if($count_course > 3 && $count_course < 6){
+           				$query_hold = "INSERT INTO holds (netid, name, description,term_id) VALUES (:netid,:name,:description,:term_id)";
         				$stmt_hold = $conn->prepare($query_hold);
         				$result_course_hold = $stmt_hold->execute(array(':netid'=>$netid,':name'=>'Enrollment to ' . $counts . 'courses',':description'=>'An academic hold has been created. Meet your graduate advisor for removal of hold. Course no ' . $course_no,':term_id'=>$term_id));
+        				
         				if($result_course_hold == TRUE){
         					$response = array();
         					$response['success'] = 1;
