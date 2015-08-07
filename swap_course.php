@@ -38,6 +38,12 @@ require "config.php";
         		$stmt = $conn->prepare($query);
         		$result_course = $stmt->execute(array(':netid'=>$netid,':course_no'=>$course_no_add,':term_id'=>$term_id));
         		if ($result_course == TRUE) {
+        			$query_del = "delete from desired_courses where netid = :netid and term_id = :term_id and course_no = :course_no";
+        			$stmt_del = $conn->prepare($query_del);
+					$stmt_del->bindParam(':netid', $netid, PDO::PARAM_STR); 
+					$stmt_del->bindParam(':term_id', $term_id, PDO::PARAM_INT); 
+        			$stmt_del->bindParam(':course_no', $course_no_add, PDO::PARAM_STR); 
+        			$result_del = $stmt_del->execute();
         			$response = array();
         			$response['success'] = 1;
            			$response['message'] = "Swap successful";

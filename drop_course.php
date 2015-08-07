@@ -44,6 +44,19 @@ require "config.php";
         $stmt->bindParam(':course_no', $course_no, PDO::PARAM_STR); 
         $result = $stmt->execute();
         if(isset($result)){
+        	$stmt = $conn->prepare("select count(*) as counts from enrolled_courses where netid = ? and term_id =?");
+			$stmt->execute(array($netid,$term_id));
+			while ($row = $stmt->fetch()) {
+		    	$count_course = $row['counts'];
+        	}
+        	$amount = $count_course * 2500 . "";
+        	$name = 'Tuition';
+        	$query_fin = "update financial_info set amount = :amount where netid = :netid and name = :name";
+        	$stmt_fin = $conn->prepare($query_fin);
+        	$stmt_fin->bindParam(':amount', $amount, PDO::PARAM_STR); 
+			$stmt_fin->bindParam(':netid', $netid, PDO::PARAM_STR); 
+			$stmt_fin->bindParam(':name', $name, PDO::PARAM_STR);
+			$result_fin = $stmt_fin->execute();
         	$response = array();
         	$response['success'] = 1;
            	$response['message'] = "Course deleted.";

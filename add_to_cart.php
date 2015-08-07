@@ -13,15 +13,25 @@
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        $query = "INSERT INTO desired_courses (netid, course_no, term_id) VALUES (:netid,:course_no,:term_id)";
-        $stmt = $conn->prepare($query);
-        $result_course = $stmt->execute(array(':netid'=>$netid,':course_no'=>$course_no,':term_id'=>$term_id));
+        $stmt = $conn->prepare("select count(*) as counts from enrolled_courses where netid = ? and term_id = ? and course_no = ?");
+		$stmt->execute(array($netid,$term_id,$course_no));
+		while ($row = $stmt->fetch()) {
+		    $counts = $row['counts'];
+        }
+        if($counts == 0){
+        	$query = "INSERT INTO desired_courses (netid, course_no, term_id) VALUES (:netid,:course_no,:term_id)";
+        	$stmt = $conn->prepare($query);
+        	$result_course = $stmt->execute(array(':netid'=>$netid,':course_no'=>$course_no,':term_id'=>$term_id));
         
-        if ($result_course == TRUE) {
-            // successfully inserted into database
-            echo "success";
-        } else {
-            echo "failed";
+        	if ($result_course == TRUE) {
+            	// successfully inserted into database
+            	echo "success";
+        	} else {
+            	echo "failed";
+        	}
+        }
+        else{
+        	echo "failed";
         }
     
     }
