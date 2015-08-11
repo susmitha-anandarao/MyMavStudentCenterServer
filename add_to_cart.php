@@ -25,13 +25,22 @@
         
         	if ($result_course == TRUE) {
             	// successfully inserted into database
-            	echo "success";
+            	$response = array();
+        		$response['success'] = 1;
+        		$response['message'] = "Course is added successfully.";
+        		echo json_encode($response);
         	} else {
-            	echo "failed";
+            	$response = array();
+        		$response['success'] = 0;
+        		$response['message'] = "Course is already in the cart.";
+        		echo json_encode($response);
         	}
         }
         else{
-        	echo "failed";
+        	$response = array();
+        	$response['success'] = 0;
+        	$response['message'] = "You are already enrolled to the course.";
+        	echo json_encode($response);
         }
     
     }

@@ -51,11 +51,11 @@ require "config.php";
         	}
         	$amount = $count_course * 2500 . "";
         	$name = 'Tuition';
-        	$query_fin = "update financial_info set amount = :amount where netid = :netid and name = :name";
+        	$query_fin = "update financial_info set amount = :amount where netid = :netid and term_id = :term_id and name = 'Tuition'";
         	$stmt_fin = $conn->prepare($query_fin);
         	$stmt_fin->bindParam(':amount', $amount, PDO::PARAM_STR); 
 			$stmt_fin->bindParam(':netid', $netid, PDO::PARAM_STR); 
-			$stmt_fin->bindParam(':name', $name, PDO::PARAM_STR);
+			$stmt_fin->bindParam(':term_id', $term_id, PDO::PARAM_STR);
 			$result_fin = $stmt_fin->execute();
         	$response = array();
         	$response['success'] = 1;

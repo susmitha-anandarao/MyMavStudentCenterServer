@@ -50,19 +50,19 @@
 		    		$count_course = $row['counts'];
         		}
         		if($count_course == 1){
-        			$query = "INSERT INTO financial_info (netid, name, description, amount, due_date) VALUES (:netid,:name,:description,:amount,:due_date)";
+        			$query = "INSERT INTO financial_info (netid, name, description, amount, due_date,term_id) VALUES (:netid,:name,:description,:amount,:due_date,:term_id)";
         			$stmt = $conn->prepare($query);
         			$description = 'Tution fee for ' . $term;
-        			$result_course = $stmt->execute(array(':netid'=>$netid,':name'=>'Tuition',':description'=>$description,':due_date'=>'2015-09-05',':amount'=>'2500'));
+        			$result_course = $stmt->execute(array(':netid'=>$netid,':name'=>'Tuition',':description'=>$description,':due_date'=>'2015-09-05',':amount'=>'2500','term_id'=>$term_id));
         		}
         		else{
         			$amount = $count_course * 2500 . "";
         			$name = 'Tuition';
-        			$query_fin = "update financial_info set amount = :amount where netid = :netid and name = :name";
+        			$query_fin = "update financial_info set amount = :amount where netid = :netid and term_id = :term_id and name = 'Tuition'";
         			$stmt_fin = $conn->prepare($query_fin);
         			$stmt_fin->bindParam(':amount', $amount, PDO::PARAM_STR); 
 					$stmt_fin->bindParam(':netid', $netid, PDO::PARAM_STR); 
-					$stmt_fin->bindParam(':name', $name, PDO::PARAM_STR);
+					$stmt_fin->bindParam(':term_id', $term_id, PDO::PARAM_STR);
 					$result_fin = $stmt_fin->execute();
         			
         		}
@@ -74,9 +74,21 @@
 		    			$count_course = $row['counts'];
         			}
            			if($count_course > 3 && $count_course < 6){
+           				$stmt = $conn->prepare("select dept_no,course_code  from courses where course_no =?");
+						$stmt->execute(array($course_no));
+						while ($row = $stmt->fetch()) {
+		    				$dept_no = $row['dept_no'];
+		    				$course_code = $row['course_code'];
+        				}
+        				$stmt = $conn->prepare("select dept_name from departments where dept_no = ?");
+						$stmt->execute(array($dept_no));
+						while ($row = $stmt->fetch()) {
+		    				$dept_name = $row['dept_name'];
+		    			}
+		    			$course = $dept_name . " " . $course_code;
            				$query_hold = "INSERT INTO holds (netid, name, description,term_id) VALUES (:netid,:name,:description,:term_id)";
         				$stmt_hold = $conn->prepare($query_hold);
-        				$result_course_hold = $stmt_hold->execute(array(':netid'=>$netid,':name'=>'Enrollment to ' . $count_course . 'courses',':description'=>'An academic hold has been created. Meet your graduate advisor for removal of hold. Course no ' . $course_no,':term_id'=>$term_id));
+        				$result_course_hold = $stmt_hold->execute(array(':netid'=>$netid,':name'=>'Enrollment to ' . $course,':description'=>'An academic hold has been created. Meet your graduate advisor for removal of hold. Course no ' . $course_no,':term_id'=>$term_id));
         				
         				if($result_course_hold == TRUE){
         					

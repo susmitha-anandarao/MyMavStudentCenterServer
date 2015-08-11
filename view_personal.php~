@@ -4,9 +4,10 @@
 */
 require "config.php";
 	//netid is retrieved from client
-    if (isset($_POST['netid'])){
+    //if (isset($_POST['netid'])){
         $response_array = array();
-        $netid = $_POST['netid'];
+        //$netid = $_POST['netid'];
+        $netid = 'sxa6933';
         //dept_no is retrieved
 		$stmt = $conn->prepare("select email,mailing_address,home_address,contact_no from students where netid = ?");
 		$stmt->execute(array($netid));
@@ -24,5 +25,5 @@ require "config.php";
         else{
             echo "failed";
         }
-    }
+    //}
 ?>

@@ -13,10 +13,11 @@ require "config.php";
 		while ($row = $stmt->fetch()) {
 		    $term_id = $row['term_id'];
         }
-        $stmt = $conn->prepare("select c.course_no,c.name,c.course_strength,c.instructor_id,c.course_time,c.room_no,c.start_date,c.end_date,c.course_code from courses c, enrolled_courses d where d.course_no = c.course_no and d.term_id = ? and d.netid = ?");
+        $stmt = $conn->prepare("select c.course_no,c.name,c.course_strength,c.instructor_id,c.course_time,c.room_no,c.start_date,c.end_date,c.course_code,c.dept_no from courses c, enrolled_courses d where d.course_no = c.course_no and d.term_id = ? and d.netid = ?");
 		$stmt->execute(array($term_id,$netid));
 		while ($row = $stmt->fetch()) {
 			$response = array(
+			'dept_no' => $row['dept_no'],
 		    'course_name' => $row['name'],
 		    'course_strength' => $row['course_strength'],
 		    'course_time' => $row['course_time'],
@@ -39,6 +40,12 @@ require "config.php";
 		    		$instructor_name = $row['name'];
 		    	}
 		    	$response_instance['instructor_name'] = $instructor_name;
+		    	$stmt = $conn->prepare("select dept_name from departments where dept_no = ?");
+				$stmt->execute(array($response_instance['dept_no']));
+				while ($row = $stmt->fetch()) {
+		    		$course_name = $row['dept_name'] . " "  . $response_instance['course_num'];
+		    	}
+		    	$response_instance['course_num'] = $course_name;
 		    	array_push($response_array_new,$response_instance);
         	}
         }
