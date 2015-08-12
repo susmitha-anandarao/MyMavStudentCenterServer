@@ -23,18 +23,18 @@ require "config.php";
         }
         
        if($counts > 3){
-       		$stmt = $conn->prepare("select description from holds where netid = ? and term_id =?");
+       		$stmt = $conn->prepare("select name from holds where netid = ? and term_id =?");
 			$stmt->execute(array($netid,$term_id));
 			while ($row = $stmt->fetch()) {
-				if(strpos($row['description'],$course_no_str) != FALSE){
-		    		$description = $row['description'];
+				if(strpos($row['name'],$counts) != FALSE){
+		    		$name = $row['name'];
 		    	}
         	}
-        	$query = "delete from holds where netid = :netid and term_id = :term_id and description = :description";
+        	$query = "delete from holds where netid = :netid and term_id = :term_id and name = :name";
         	$stmt = $conn->prepare($query);
 			$stmt->bindParam(':netid', $netid, PDO::PARAM_STR); 
 			$stmt->bindParam(':term_id', $term_id, PDO::PARAM_INT); 
-        	$stmt->bindParam(':description', $description, PDO::PARAM_STR); 
+        	$stmt->bindParam(':name', $name, PDO::PARAM_STR); 
         	$result = $stmt->execute();
        }
        $query = "delete from enrolled_courses where netid = :netid and term_id = :term_id and course_no = :course_no";

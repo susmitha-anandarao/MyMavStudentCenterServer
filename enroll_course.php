@@ -88,7 +88,7 @@
 		    			$course = $dept_name . " " . $course_code;
            				$query_hold = "INSERT INTO holds (netid, name, description,term_id) VALUES (:netid,:name,:description,:term_id)";
         				$stmt_hold = $conn->prepare($query_hold);
-        				$result_course_hold = $stmt_hold->execute(array(':netid'=>$netid,':name'=>'Enrollment to ' . $course,':description'=>'An academic hold has been created. Meet your graduate advisor for removal of hold. Course no ' . $course_no,':term_id'=>$term_id));
+        				$result_course_hold = $stmt_hold->execute(array(':netid'=>$netid,':name'=>'Enrollment to ' . $count_course . ' courses',':description'=>'An academic hold has been created. Meet your graduate advisor for removal of hold. Course no ' . $course_no,':term_id'=>$term_id));
         				
         				if($result_course_hold == TRUE){
         					
